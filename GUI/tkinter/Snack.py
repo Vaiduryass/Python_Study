@@ -84,7 +84,7 @@ class Snake(threading.Thread):
             self._delete()
         while not self.gui.is_game_over:
             self.queue.put({'move':self.snake_points})
-            time.sleep(0.2)
+            time.sleep(0.1)
             self.move()
 
     def key_pressed(self,e):
