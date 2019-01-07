@@ -1,5 +1,5 @@
 from PIL import Image
-import numpy as np
+import _numpy as np
 import pylab 
 # 读取图像到数组中
 im = np.array(Image.open('C:\\Users\\vaiduryass\\Desktop\\Infrared.jpg'))

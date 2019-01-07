@@ -24,6 +24,7 @@ im = array(Image.open('Infrared.jpg').convert('L'))
 figure()
 # 不使用颜色信息
 gray()
+imshow(im)
 # 在原点的左上角显示轮廓图像
 contour(im, origin='image')
 axis('equal')
