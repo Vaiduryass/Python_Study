@@ -5,6 +5,7 @@ import random
 import os, struct
 from array import array as pyarray
 from numpy import append, array, int8, uint8, zeros
+import matplotlib.pyplot as plt
  
 class NeuralNet(object):
  
@@ -46,6 +47,7 @@ class NeuralNet(object):
         nabla_w[-1] = np.dot(delta, activations[-2].transpose())
  
         for l in range(2, self.num_layers_):
+            #这个是l（L），不是1
             z = zs[-l]
             sp = self.sigmoid_prime(z)
             delta = np.dot(self.w_[-l+1].transpose(), delta) * sp
@@ -97,7 +99,7 @@ class NeuralNet(object):
     def load(self):
         pass
  
-def load_mnist(dataset="training_data", digits=np.arange(10), path="."):
+def load_mnist(dataset="training_data", digits=np.arange(10), path=""):
  
     if dataset == "training_data":
         fname_image = os.path.join(path, 'train-images.idx3-ubyte')
@@ -117,12 +119,13 @@ def load_mnist(dataset="training_data", digits=np.arange(10), path="."):
     magic_nr, size, rows, cols = struct.unpack(">IIII", fimg.read(16))
     img = pyarray("B", fimg.read())
     fimg.close()
+    
  
     ind = [ k for k in range(size) if lbl[k] in digits ]
     N = len(ind)
  
-    images = zeros((N, rows, cols), dtype=uint8)
-    labels = zeros((N, 1), dtype=int8)
+    images = np.zeros((N, rows, cols), dtype=uint8)
+    labels = np.zeros((N, 1), dtype=int8)
     for i in range(len(ind)):
         images[i] = array(img[ ind[i]*rows*cols : (ind[i]+1)*rows*cols ]).reshape((rows, cols))
         labels[i] = lbl[ind[i]]
@@ -132,8 +135,9 @@ def load_mnist(dataset="training_data", digits=np.arange(10), path="."):
 def load_samples(dataset="training_data"):
  
     image,label = load_mnist(dataset)
- 
+    
     X = [np.reshape(x,(28*28, 1)) for x in image]
+
     X = [x/255.0 for x in X]   # 灰度值范围(0-255)，转换为(0-1)
  
     # 5 -> [0,0,0,0,0,1.0,0,0,0];  1 -> [0,1.0,0,0,0,0,0,0,0]
