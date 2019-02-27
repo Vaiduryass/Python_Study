@@ -37,7 +37,7 @@ def inference(input_tensor, avg_class, weights1, biases1, weights2, biases2):
         #首先使用avg_class.average函数来计算得出变量的滑动平均值，
         #然后再计算相应的神经网络前向传播结果。
         layer1 = tf.nn.relu(tf.matmul(input_tensor, avg_class.average(weights1)) + avg_class.average(biases1))
-        return  tf.matmul(layer1, avg_class.average(weights2)) + avg_class.average(biases2)
+        return tf.matmul(layer1, avg_class.average(weights2)) + avg_class.average(biases2)
 
 #训练模型的过程
 def train(mnist):
@@ -45,10 +45,10 @@ def train(mnist):
     y_ = tf.placeholder(tf.float32, [None, OUTPUT_NODE], name='y-input')
 
     #生成隐藏层的参数。
-    weights1 = tf.Variable(tf.truncated_normal([INPUT_NODE, LAYER1_NODE]), stddev=0.1)
+    weights1 = tf.Variable(tf.truncated_normal([INPUT_NODE, LAYER1_NODE],stddev=0.1))
     biases1 = tf.Variable(tf.constant(0.1, shape=[LAYER1_NODE]))
     #生成输出层的参数。
-    weights2 = tf.Variable(tf.truncated_normal([LAYER1_NODE, OUTPUT_NODE], stddev=0.1))
+    weights2 = tf.Variable(tf.truncated_normal([LAYER1_NODE, OUTPUT_NODE],stddev=0.1))
     biases2 = tf.Variable(tf.constant(0.1, shape=[OUTPUT_NODE]))
 
     #计算当前参数下神经网络前向传播的结果。这里给出的用于计算华东平均的类为None，
@@ -62,18 +62,18 @@ def train(mnist):
 
     #给定滑动平均衰减率和训练轮数的变量，初始化滑动平均类。在第4章中介绍过给
     #定训练轮数的变量可以加快训练早前变量的更新速度。
-    variable_avarages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY, global_step)
+    variable_averages = tf.train.ExponentialMovingAverage(MOVING_AVERAGE_DECAY, global_step)
 
     #在所有代表神经网络参数的变量上使用滑动平均。其他辅助变量（比如global_step）就
     #不需要了。tf.trainable_variables返回的就是图上集合
     #GraphKeys.TRAINABLE_VARIBALES中的元素。这个集合的元素就是所有没有指定
     #trainable=False的参数。
-    variable_avarages_op = variable_avarages.apply(tf.trainable_variables())
+    variable_averages_op = variable_averages.apply(tf.trainable_variables())
 
     #计算使用了滑动平均之后的前向传播结果。在第4章中介绍过滑动平均不会改变变量本身的
     #取值，而是会维护一个影子变量来记录其滑动平均值。所以当需要使用这个滑动平均值时，
     #需要明确调用average函数。
-    average_y = inference(x, variable_avarages, weights1, biases1, weights2, biases2)
+    average_y = inference(x, variable_averages, weights1, biases1, weights2, biases2)
 
     #计算交叉熵作为刻画预测值和真实值之间差距的损失函数。这里使用了TensoFlow中提
     #供的sparse_softman_cross_entropy_with_logits函数来计算交叉熵。当分类
@@ -82,7 +82,7 @@ def train(mnist):
     #参数是神经网络不包含softmax层的前向传播结果，第二个是训练数据的正确答案。因为
     #标准答案是一个长度为10的一维数组，而该函数需要提供的是一个正确答案的数字，所以需
     #要使用tf.argmax函数来得到正确答案对应的类别编号。
-    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(y, tf.argmax(y_, 1))
+    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=y, labels=tf.argmax(y_, 1))
     #计算在当前batch中所有样例的交叉熵平均值。
     cross_entropy_mean = tf.reduce_mean(cross_entropy)
 
@@ -97,7 +97,8 @@ def train(mnist):
                                                                             #学习率在这个基础上递减。
                                                global_step,         #当前迭代的轮数。
                                                mnist.train.num_examples/ BATCH_SIZE,        #过完所有的训练数据需要的迭代次数。
-                                               LEARNING_RATE_DECAY)         #学习率衰减速度。
+                                               LEARNING_RATE_DECAY,         #学习率衰减速度。
+                                               staircase=True)         
     #使用tf.train.GradientDescentOptimizer优化算法来优化损失函数。注意这里损失函数
     #包含了交叉熵损失和L2正则化损失。
     train_step = tf.train.GradientDescentOptimizer(learning_rate).minimize(loss, global_step = global_step)
@@ -106,7 +107,7 @@ def train(mnist):
     #又要更新每一个参数的滑动平均值。为了一次完成多个操作，TensorFlow提供了
     #tf.control_dependencies和tf.group两种机制。下面两行程序和
     #train_op = tf.group([train_step, variables_averages_op])是等价的
-    with tf.control_dependencies([train_step, variable_avarages_op]):
+    with tf.control_dependencies([train_step, variable_averages_op]):
         train_op = tf.no_op(name='train')
 
     #检验使用了滑动平均模型的神经网络前向传播结果是否正确。tf.argmax(average_y, 1)
@@ -140,8 +141,16 @@ def train(mnist):
                 #小的batch。当神经网络模型比较复杂或者验证数据比较大时，太大的batch
                 #会导致计算时间过长甚至发生内存溢出的错误。
                 validate_acc = sess.run(accuracy, feed_dict=validate_feed)
-                print("After %d training step(s), validation accuracy",
-                      "using average model is %g" % (i, validate_acc))
+                print("After %d training step(s), validation accuracy using average model is %g" % (i, validate_acc))
+
+            #产生这一轮使用的一个batch的训练数据，并运行训练过程。
+            xs, ys = mnist.train.next_batch(BATCH_SIZE)
+            sess.run(train_op, feed_dict={x: xs, y_: ys})
+
+        #在训练结束之后，在测试数据上检测神经网络模型最终正确率。    
+        test_acc = sess.run(accuracy, feed_dict=test_feed)
+        print(("After %d training step(s), test accuracy using average model is %g" % (TRAINING_STEPS, test_acc)))
+            
 
 #主程序入口。
 def main(argv=None):
