@@ -13,7 +13,7 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Deep learn/TensorFlow/mnist_demo.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-74">
+            <state relative-caret-position="1843">
               <caret line="98" column="83" selection-start-line="98" selection-start-column="47" selection-end-line="98" selection-end-column="83" />
               <folding>
                 <element signature="e#0#23#0" expanded="true" />
@@ -31,13 +31,25 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/Deep learn/TensorFlow/mnist_best_demo/mnist_train.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-454">
-              <caret line="19" selection-start-line="19" selection-end-line="19" />
+            <state relative-caret-position="388">
+              <caret line="64" lean-forward="true" selection-start-line="64" selection-end-line="71" />
               <folding>
                 <element signature="e#0#9#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/Deep learn/TensorFlow/mnist_best_demo/mnist_eval.py">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="312">
+              <caret line="47" column="12" selection-start-line="47" selection-start-column="12" selection-end-line="47" selection-end-column="12" />
+              <folding>
+                <element signature="e#0#11#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -79,13 +91,14 @@
         <option value="$PROJECT_DIR$/Deep learn/TensorFlow/mnist_best_demo/mnist_inference.py" />
         <option value="$PROJECT_DIR$/Deep learn/TensorFlow/Neural Networks/mnist_train.py" />
         <option value="$PROJECT_DIR$/Deep learn/TensorFlow/mnist_best_demo/mnist_train.py" />
+        <option value="$PROJECT_DIR$/Deep learn/TensorFlow/mnist_best_demo/mnist_eval.py" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="952" />
-    <option name="width" value="977" />
-    <option name="height" value="1038" />
+    <option name="x" value="951" />
+    <option name="width" value="978" />
+    <option name="height" value="1039" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -157,7 +170,7 @@
       </list>
     </option>
   </component>
-  <component name="RunManager" selected="Python.mnist_train">
+  <component name="RunManager" selected="Python.mnist_eval">
     <configuration name="mnist_demo" type="PythonConfigurationType" factoryName="Python" temporary="true">
       <module name="Python_Study" />
       <option name="INTERPRETER_OPTIONS" value="" />
@@ -171,6 +184,27 @@
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Deep learn/TensorFlow/mnist_demo.py" />
+      <option name="PARAMETERS" value="" />
+      <option name="SHOW_COMMAND_LINE" value="false" />
+      <option name="EMULATE_TERMINAL" value="false" />
+      <option name="MODULE_MODE" value="false" />
+      <option name="REDIRECT_INPUT" value="false" />
+      <option name="INPUT_FILE" value="" />
+      <method v="2" />
+    </configuration>
+    <configuration name="mnist_eval" type="PythonConfigurationType" factoryName="Python" temporary="true">
+      <module name="Python_Study" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <envs>
+        <env name="PYTHONUNBUFFERED" value="1" />
+      </envs>
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$/Deep learn/TensorFlow/mnist_best_demo" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Deep learn/TensorFlow/mnist_best_demo/mnist_eval.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
       <option name="EMULATE_TERMINAL" value="false" />
@@ -202,6 +236,7 @@
     </configuration>
     <recent_temporary>
       <list>
+        <item itemvalue="Python.mnist_eval" />
         <item itemvalue="Python.mnist_train" />
         <item itemvalue="Python.mnist_demo" />
       </list>
@@ -221,15 +256,14 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="762" y="0" width="781" height="830" extended-state="0" />
-    <editor active="true" />
+    <frame x="761" y="0" width="782" height="831" extended-state="0" />
     <layout>
-      <window_info content_ui="combo" id="Project" order="0" weight="0.5181208" />
+      <window_info content_ui="combo" id="Project" order="0" weight="0.51742625" />
       <window_info id="Structure" order="1" weight="0.24966443" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.3252149" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32474965" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -286,7 +320,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Deep learn/TensorFlow/mnist_demo.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-74">
+        <state relative-caret-position="1843">
           <caret line="98" column="83" selection-start-line="98" selection-start-column="47" selection-end-line="98" selection-end-column="83" />
           <folding>
             <element signature="e#0#23#0" expanded="true" />
@@ -303,10 +337,20 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/Deep learn/TensorFlow/mnist_best_demo/mnist_train.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-454">
-          <caret line="19" selection-start-line="19" selection-end-line="19" />
+        <state relative-caret-position="388">
+          <caret line="64" lean-forward="true" selection-start-line="64" selection-end-line="71" />
           <folding>
             <element signature="e#0#9#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/Deep learn/TensorFlow/mnist_best_demo/mnist_eval.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="312">
+          <caret line="47" column="12" selection-start-line="47" selection-start-column="12" selection-end-line="47" selection-end-column="12" />
+          <folding>
+            <element signature="e#0#11#0" expanded="true" />
           </folding>
         </state>
       </provider>
