@@ -1,0 +1,7 @@
+下载训练所需数据集
+https://download.tensorflow.org/example_images/flower_photos.tgz
+解压放入path/to/flower_data
+
+下载谷歌提供的训练好的Inception-V3模型
+https://stotage.googleapis.com/download.tensorflow.org/models/inception_dec-2015.zip
+解压放入path/to/model
