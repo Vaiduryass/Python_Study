@@ -147,7 +147,7 @@ def get_or_create_bottleneck(sess, image_lists, label_name, index, category, jpe
         #将计算得到的特征向量存入文件。
         bottleneck_string = ','.join(str(x) for x in bottleneck_values)
         with open(bottleneck_path, 'w') as bottleneck_file:
-            bottleneck_file.write(bottleneck_file)
+            bottleneck_file.write(bottleneck_string)
 
     else:
         #直接从文件中获取图片相应的特征向量。
@@ -165,7 +165,7 @@ def get_random_cached_bottlenecks(sess, n_classes, image_lists, how_many,
     for _ in range(how_many):
         #随机一个类别的图片的编号加入当前的训练数据。
         label_index = random.randrange(n_classes)
-        label_name = list(image_lists.ketys())[label_index]
+        label_name = list(image_lists.keys())[label_index]
         image_index = random.randrange(65536)
         bottleneck = get_or_create_bottleneck(sess, image_lists, label_name, image_index,
                                               category, jpeg_data_tensor, bottleneck_tensor)
@@ -194,8 +194,69 @@ def get_test_bottlenecks(sess, image_lists, n_classes, jpeg_data_tensor, bottlen
             ground_truths.append(ground_truth)
     return bottlenecks, ground_truths
 
-def main():
+def main(self):
     #读取所有图片。
     image_lists = create_image_lists(TEST_PERCENTAGE, VALIDATION_PERCENTAGE)
     n_classes = len(image_lists.keys())
-    #读取
+    #读取已经训练好的Inception-v3模型。谷歌训练好的模型保存在了GraphDefProtocol
+    #Buffer中，里面保存了每一个节点取值的计算方法以及变量的取值。TensorFlow模型持
+    #久化的问题在第5章中有了详细的介绍。
+    with gfile.FastGFile(os.path.join(MODEL_DIR, MODEL_FILE), 'rb') as f:
+        graph_def = tf.GraphDef()
+        graph_def.ParseFromString(f.read())
+    #加载读取的Inception-v3模型，并返回数据输入所对应的张量以及计算瓶颈层结果所对应
+    #的张量。
+    bottleneck_tensor, jpeg_data_tensor = tf.import_graph_def(graph_def,
+    return_elements=[BOTTLENECK_TENSOR_NAME, JPEG_DATA_TENSOR_NAME])
+
+    #定义新的神经网络输入，这个输入就是新的图片经过Inception-v3模型前向传播到达瓶颈层
+    #时的节点取值。可以将这个过程类似的理解为一种特征提取。
+    bottleneck_input = tf.placeholder(
+        tf.float32, [None, BOTTLENECK_TENSOR_SIZE], name='BottleneckInputPlaceholder')
+    #定义新的标准答案输入。
+    ground_truth_input = tf.placeholder(
+        tf.float32, [None, n_classes], name='GroundTruthInput')
+    #定义一层全连接层来解决新的图片分类问题。因为训练好的Inception-v3模型已经将原始
+    #的图片抽象为了更加容易分类的特征向量了，所以不需要再训练那么复杂的神经网络来完成
+    #这个新的分类任务。
+    with tf.name_scope('final_training_ops'):
+        weights = tf.Variable(tf.truncated_normal([BOTTLENECK_TENSOR_SIZE, n_classes], stddev=0.001))
+        biases = tf.Variable(tf.zeros([n_classes]))
+        logits = tf.matmul(bottleneck_input, weights) + biases
+        final_tensor = tf.nn.softmax(logits)
+
+    #定义交叉熵损失函数。
+    cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits,labels=tf.argmax(ground_truth_input, 1))
+    cross_entropy_mean = tf.reduce_mean(cross_entropy)
+    train_step = tf.train.GradientDescentOptimizer(LEARNING_RATE).minimize(cross_entropy_mean)
+
+    #计算正确率。
+    with tf.name_scope('evaluation'):
+        correct_prediction = tf.equal(tf.argmax(final_tensor, 1), tf.argmax(ground_truth_input, 1))
+        evaluation_step = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
+    with tf.Session() as sess:
+        tf.initialize_all_variables().run()
+
+        #训练过程。
+        for i in range(STEPS):
+            #每次获取一个batch的训练数据。
+            train_bottlenecks, train_ground_truth = get_random_cached_bottlenecks(
+                sess, n_classes, image_lists, BATCH, 'training', jpeg_data_tensor, bottleneck_tensor)
+            sess.run(train_step, feed_dict={bottleneck_input: train_bottlenecks,
+                                            ground_truth_input: train_ground_truth})
+
+            #在验证数据上测试正确率。
+            if i % 1 == 0 or i + 1 == STEPS:
+                validation_bottlenecks, validation_ground_truth = get_random_cached_bottlenecks(
+                    sess, n_classes, image_lists, BATCH,
+                    'validation', jpeg_data_tensor, bottleneck_tensor)
+                validation_accuracy = sess.run(
+                    evaluation_step, feed_dict={bottleneck_input: validation_bottlenecks,
+                                                ground_truth_input: validation_ground_truth})
+                print('i')
+
+
+if __name__ == '__main__':
+    tf.app.run()
+
