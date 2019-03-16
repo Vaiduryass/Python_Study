@@ -141,7 +141,7 @@ def get_or_create_bottleneck(sess, image_lists, label_name, index, category, jpe
         #获取原始的图片路径。
         image_path = get_image_path(image_lists, INPUT_DATA, label_name, index, category)
         #获取图片内容。
-        image_data = gfile.FastGFile(image_path, 'rb').read()
+        image_data = gfile.GFile(image_path, 'rb').read()
         #通过Inception-v3模型计算特征向量.
         bottleneck_values = run_bottleneck_on_image(sess, image_data, jpeg_data_tensor, bottleneck_tensor)
         #将计算得到的特征向量存入文件。
@@ -153,7 +153,7 @@ def get_or_create_bottleneck(sess, image_lists, label_name, index, category, jpe
         #直接从文件中获取图片相应的特征向量。
         with open(bottleneck_path, 'r') as bottleneck_file:
             bottleneck_string = bottleneck_file.read()
-        bottleneck_values = [float(x) for x in bottleneck_string.split(',')]
+        bottleneck_values = [x for x in bottleneck_string.split(',')]
     #返回得到的特征向量。
     return bottleneck_values
 
@@ -194,6 +194,8 @@ def get_test_bottlenecks(sess, image_lists, n_classes, jpeg_data_tensor, bottlen
             ground_truths.append(ground_truth)
     return bottlenecks, ground_truths
 
+
+
 def main(self):
     #读取所有图片。
     image_lists = create_image_lists(TEST_PERCENTAGE, VALIDATION_PERCENTAGE)
@@ -201,7 +203,7 @@ def main(self):
     #读取已经训练好的Inception-v3模型。谷歌训练好的模型保存在了GraphDefProtocol
     #Buffer中，里面保存了每一个节点取值的计算方法以及变量的取值。TensorFlow模型持
     #久化的问题在第5章中有了详细的介绍。
-    with gfile.FastGFile(os.path.join(MODEL_DIR, MODEL_FILE), 'rb') as f:
+    with gfile.GFile(os.path.join(MODEL_DIR, MODEL_FILE), 'rb') as f:
         graph_def = tf.GraphDef()
         graph_def.ParseFromString(f.read())
     #加载读取的Inception-v3模型，并返回数据输入所对应的张量以及计算瓶颈层结果所对应
@@ -224,6 +226,7 @@ def main(self):
         biases = tf.Variable(tf.zeros([n_classes]))
         logits = tf.matmul(bottleneck_input, weights) + biases
         final_tensor = tf.nn.softmax(logits)
+        print(final_tensor)
 
     #定义交叉熵损失函数。
     cross_entropy = tf.nn.sparse_softmax_cross_entropy_with_logits(logits=logits,labels=tf.argmax(ground_truth_input, 1))
@@ -236,7 +239,7 @@ def main(self):
         evaluation_step = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
 
     with tf.Session() as sess:
-        tf.initialize_all_variables().run()
+        tf.global_variables_initializer().run()
 
         #训练过程。
         for i in range(STEPS):
@@ -254,7 +257,10 @@ def main(self):
                 validation_accuracy = sess.run(
                     evaluation_step, feed_dict={bottleneck_input: validation_bottlenecks,
                                                 ground_truth_input: validation_ground_truth})
-                print('i')
+                print('%.1f%%' % (validation_accuracy*100))
+                saver = tf.train.Saver()
+                saver.save(sess, "path/to/save/model.ckpt")
+                print(sess.run("final_training_ops/Softmax:0",feed_dict={bottleneck_input:train_bottlenecks}))
 
 
 if __name__ == '__main__':
