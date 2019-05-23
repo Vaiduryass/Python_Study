@@ -121,6 +121,7 @@ class Ui_Form(object):
         a = QtWidgets.QFileDialog.getOpenFileNames(self, 'Open file', 'c:\\',"Image files (*.jpg *.gif)")
         for i in a[0]:
             s = os.path.basename(i)
+            print(i,s)
             dir_1 = "path/" +item.text()+ "/"+s
             shutil.copy(i, dir_1)
             print(dir_1)
@@ -160,6 +161,7 @@ class Ui_Form(object):
             return False
     def getIext(self):	
 	    text, ok = QtWidgets.QInputDialog.getText(self, 'Text Input Dialog', '添加故障类别:')
+	    print(text,ok)
 	    if ok:
                 path = "path\\"+text
                 self.mkdir(path)
